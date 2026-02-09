@@ -161,7 +161,8 @@ class mainModel
 
     /* Función para eliminar registros */
 
-    protected function eliminarRegistro($tabla, $campo, $id){
+    protected function eliminarRegistro($tabla, $campo, $id)
+    {
 
         $query = "DELETE FROM $tabla WHERE $campo = '$id'";
 
@@ -173,6 +174,135 @@ class mainModel
 
         return $sql;
     }
-}
 
-//Video tutorial #23
+    /*Paginador de tablas*/
+
+    protected function paginadorTablas($pagina, $numeroPaginas, $url, $botones)
+    {
+
+        $tabla = '<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">';
+
+        if ($pagina <= 1) {
+
+            $tabla .= '<a class="pagination-previous is disabled" disabled><i class="fas fa-arrow-alt-circle-left"></i> &           nbsp; Anterior</a>
+
+            <ul class="pagination-list">            
+            ';
+        } else {
+            $tabla .= '
+            <a class="pagination-previous" href="' . $url . ($pagina - 1) . '/"> <i class="fas fa-arrow-alt-circle-left"></i> &nbsp; Anterior</a>
+
+            <ul class="pagination-list">
+                <li><a class="pagination-link" href="' . $url . '1/">1</a></li>
+                <li><span class="pagination-ellipsis">&hellip;</span></li>            
+            ';
+        }
+
+        $ci = 0;
+        for ($i = $pagina; $i = $numeroPaginas; $i++) {
+
+            if ($ci >= $botones) {
+                break;
+            }
+            if ($pagina == $ci) {
+                $tabla .= '<li><a class="pagination-link is-current" href="' . $url . $i . '/">' . $i . '</a></li>';
+            } else {
+                $tabla .= '<li><a class="pagination-link is-current" href="' . $url . $i . '/">' . $i . '</a></li>';
+            }
+
+            $ci++;
+        }
+
+        if ($pagina == $numeroPaginas) {
+            $tabla .= '
+            </ul>
+            <a class="pagination-next is-disabled" disabled ><i class="fas fa-arrow-alt-circle-right"></i> &nbsp; Siguiente</a>                    
+            ';
+        } else {
+            $tabla .= '
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+                <li><a class="pagination-link" href="' . $url . $numeroPaginas . '/">' . $numeroPaginas . '</a></li>
+            </ul>
+            <a class="pagination-next" href="' . $url . ($pagina + 1) . '/"><i class="fas fa-arrow-alt-circle-right"></i> &nbsp; Siguiente</a>
+            ';
+        }
+
+        $tabla .= '</nav>';
+        return $tabla;
+    }
+
+    /*Funcion para generar los select */
+
+    public function generarSelect($datos, $campo_db)
+    {
+
+        $check_select = '';
+        $text_select = '';
+        $count_select = 1;
+        $select = '';
+
+        foreach ($datos as $row) {
+            if ($campo_db == $row) {
+
+                $check_select = 'selected=""';
+                $text_select = '(Actual)';
+            }
+
+            $select .= '<option value="' . $row . '" ' . $check_select . '> ' . $count_select . ' - ' . $row . $text_select . ' (Actual)</option>';
+
+            $check_select = '';
+            $text_select = '';
+            $count_select++;
+        }
+
+        return $select;
+    }
+
+    /*Función para generar códigos aleatorios */
+
+    protected function generarCodigosAleatorios($longitud, $correlativo){
+
+        $codigo="";
+        $caracter="Letra";
+        for ($i=1; $i <=$longitud ; $i++) {
+            if ($caracter == "Letra") {
+                $letra_aleatoria = chr(rand(ord("a"),ord("z")));
+                $letra_aleatoria=strtoupper($letra_aleatoria);
+                $codigo.= $letra_aleatoria;
+                $caracter="Numero";
+            } else {
+                $numero_aleatorio= rand(0,9);
+                $codigo.= $numero_aleatorio;
+                $caracter= "Letra";               
+            }           
+        }
+        return $codigo . "-" . $correlativo;
+    }
+
+    /*Limitar cadenas de texto */
+
+    public function limitarCadena($cadena, $limite, $sufijo){
+
+    if (strlen($cadena) > $limite){
+        return substr($cadena, 0, $limite).$sufijo;
+
+    } else {
+       return $cadena;
+    }
+
+    }
+
+    /*Funcion para verificar fechas*/
+
+    public function verificarFecha($fecha){
+
+        $valores= explode('-', $fecha);
+
+        if (count($valores)==3 && checkdate($valores[1], $valores[2], $valores[0])) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+/*Video completo #28*/
